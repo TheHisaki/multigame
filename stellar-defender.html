@@ -452,31 +452,26 @@
             display: flex;
         }
 
-        .direction-pad {
-            display: grid;
-            grid-template-columns: repeat(3, 70px);
-            grid-template-rows: repeat(3, 70px);
-            gap: 10px;
+        .joystick-zone {
+            width: 150px;
+            height: 150px;
+            position: relative;
+            background: rgba(67, 97, 238, 0.1);
+            border: 2px solid var(--primary-color);
+            border-radius: 50%;
         }
 
-        .direction-btn {
+        .joystick {
             width: 70px;
             height: 70px;
             background: rgba(67, 97, 238, 0.3);
-            border: 2px solid var(--primary-color);
-            border-radius: 15px;
-            color: white;
-            font-size: 2em;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            touch-action: none;
-        }
-
-        .direction-btn:active {
-            background: var(--primary-color);
-            transform: scale(0.95);
+            border: 3px solid var(--primary-color);
+            border-radius: 50%;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.1s ease;
         }
 
         .action-buttons {
@@ -551,15 +546,14 @@
                 font-size: 1.2em;
             }
 
-            .direction-pad {
-                grid-template-columns: repeat(3, 80px);
-                grid-template-rows: repeat(3, 80px);
+            .joystick-zone {
+                width: 180px;
+                height: 180px;
             }
 
-            .direction-btn {
+            .joystick {
                 width: 80px;
                 height: 80px;
-                font-size: 2.2em;
             }
 
             .shoot-btn {
@@ -577,24 +571,8 @@
     </style>
 
     <div class="touch-buttons">
-        <div class="direction-pad">
-            <div></div>
-            <button class="direction-btn" data-direction="up">
-                <i class="fas fa-chevron-up"></i>
-            </button>
-            <div></div>
-            <button class="direction-btn" data-direction="left">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <div></div>
-            <button class="direction-btn" data-direction="right">
-                <i class="fas fa-chevron-right"></i>
-            </button>
-            <div></div>
-            <button class="direction-btn" data-direction="down">
-                <i class="fas fa-chevron-down"></i>
-            </button>
-            <div></div>
+        <div class="joystick-zone">
+            <div class="joystick"></div>
         </div>
         <div class="action-buttons">
             <button class="special-btn">
@@ -968,34 +946,81 @@
 
             initTouchControls() {
                 const touchButtons = document.querySelector('.touch-buttons');
+                const joystickZone = document.querySelector('.joystick-zone');
+                const joystick = document.querySelector('.joystick');
+                let isDragging = false;
+                let startX, startY;
                 
                 // S'assurer que les boutons sont visibles en mode tactile
                 if (this.controlMode === 'touch') {
                     touchButtons.style.display = 'flex';
                 }
 
-                // Gestion des boutons directionnels
-                const directionButtons = document.querySelectorAll('.direction-btn');
-                directionButtons.forEach(btn => {
-                    const direction = btn.dataset.direction;
+                // Gestion du joystick
+                const handleJoystickStart = (e) => {
+                    isDragging = true;
+                    const touch = e.type === 'mousedown' ? e : e.touches[0];
+                    startX = touch.clientX - joystick.offsetLeft;
+                    startY = touch.clientY - joystick.offsetTop;
+                    e.preventDefault();
+                };
+
+                const handleJoystickMove = (e) => {
+                    if (!isDragging) return;
                     
-                    const handleStart = (e) => {
-                        e.preventDefault();
-                        this.touchControls[direction] = true;
-                    };
+                    const touch = e.type === 'mousemove' ? e : e.touches[0];
+                    const zoneRect = joystickZone.getBoundingClientRect();
+                    const zoneCenterX = zoneRect.left + zoneRect.width / 2;
+                    const zoneCenterY = zoneRect.top + zoneRect.height / 2;
                     
-                    const handleEnd = (e) => {
-                        e.preventDefault();
-                        this.touchControls[direction] = false;
-                    };
+                    let deltaX = touch.clientX - zoneCenterX;
+                    let deltaY = touch.clientY - zoneCenterY;
                     
-                    btn.addEventListener('touchstart', handleStart);
-                    btn.addEventListener('mousedown', handleStart);
-                    btn.addEventListener('touchend', handleEnd);
-                    btn.addEventListener('touchcancel', handleEnd);
-                    btn.addEventListener('mouseup', handleEnd);
-                    btn.addEventListener('mouseleave', handleEnd);
-                });
+                    // Limiter le joystick au cercle
+                    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                    const maxDistance = zoneRect.width / 2 - joystick.offsetWidth / 2;
+                    
+                    if (distance > maxDistance) {
+                        const angle = Math.atan2(deltaY, deltaX);
+                        deltaX = Math.cos(angle) * maxDistance;
+                        deltaY = Math.sin(angle) * maxDistance;
+                    }
+                    
+                    // Mettre à jour la position du joystick
+                    joystick.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+                    
+                    // Mettre à jour les contrôles
+                    const normalizedX = deltaX / maxDistance;
+                    const normalizedY = deltaY / maxDistance;
+                    
+                    this.touchControls.left = normalizedX < -0.3;
+                    this.touchControls.right = normalizedX > 0.3;
+                    this.touchControls.up = normalizedY < -0.3;
+                    this.touchControls.down = normalizedY > 0.3;
+                    
+                    e.preventDefault();
+                };
+
+                const handleJoystickEnd = (e) => {
+                    isDragging = false;
+                    joystick.style.transform = 'translate(-50%, -50%)';
+                    this.touchControls.left = false;
+                    this.touchControls.right = false;
+                    this.touchControls.up = false;
+                    this.touchControls.down = false;
+                    e.preventDefault();
+                };
+
+                // Événements tactiles pour le joystick
+                joystickZone.addEventListener('touchstart', handleJoystickStart);
+                joystickZone.addEventListener('touchmove', handleJoystickMove);
+                joystickZone.addEventListener('touchend', handleJoystickEnd);
+                joystickZone.addEventListener('touchcancel', handleJoystickEnd);
+
+                // Événements souris pour le joystick (pour les tests)
+                joystickZone.addEventListener('mousedown', handleJoystickStart);
+                window.addEventListener('mousemove', handleJoystickMove);
+                window.addEventListener('mouseup', handleJoystickEnd);
 
                 // Gestion du bouton de tir
                 const shootButton = document.querySelector('.shoot-btn');
@@ -1012,7 +1037,7 @@
                                 }
                             }, 200);
                         }
-                    };
+                    }
                 };
 
                 const handleShootEnd = (e) => {
