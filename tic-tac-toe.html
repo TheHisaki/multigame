@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Morpion</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+</head>
+<body>
+    <canvas id="background-canvas"></canvas>
+
+    <div class="global-controls">
+        <button id="theme-toggle" class="control-btn" title="Changer de thème">
+            <i class="fas fa-moon"></i>
+        </button>
+        <button id="sound-toggle" class="control-btn" title="Son">
+            <i class="fas fa-volume-up"></i>
+        </button>
+        <a href="index.html" class="control-btn" title="Retour au menu">
+            <i class="fas fa-home"></i>
+        </a>
+    </div>
+
+    <div class="container">
+        <div id="game-setup" class="game-setup">
+            <h2>Configuration de la partie</h2>
+            
+            <div class="setup-step active" data-step="1">
+                <h3>Mode de jeu</h3>
+                <div class="choice-buttons">
+                    <button class="choice-btn" data-mode="human">
+                        <i class="fas fa-user-friends"></i>
+                        <span>Joueur vs Joueur</span>
+                    </button>
+                    <button class="choice-btn" data-mode="bot">
+                        <i class="fas fa-robot"></i>
+                        <span>Joueur vs Bot</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="setup-step" data-step="2">
+                <h3>Niveau de difficulté</h3>
+                <div class="choice-buttons">
+                    <button class="choice-btn" data-difficulty="easy">
+                        <i class="fas fa-baby"></i>
+                        <span>Facile</span>
+                        <small>Le bot joue aléatoirement</small>
+                    </button>
+                    <button class="choice-btn" data-difficulty="normal">
+                        <i class="fas fa-user"></i>
+                        <span>Normal</span>
+                        <small>Le bot joue défensivement</small>
+                    </button>
+                    <button class="choice-btn" data-difficulty="hard">
+                        <i class="fas fa-robot"></i>
+                        <span>Difficile</span>
+                        <small>Le bot joue parfaitement</small>
+                    </button>
+                </div>
+            </div>
+
+            <div class="setup-step" data-step="3">
+                <h3>Choisissez votre forme</h3>
+                <div class="choice-buttons">
+                    <button class="choice-btn" data-symbol="X">
+                        <div class="symbol-preview x-preview"></div>
+                        <span>Joueur X</span>
+                    </button>
+                    <button class="choice-btn" data-symbol="O">
+                        <div class="symbol-preview o-preview"></div>
+                        <span>Joueur O</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="setup-step" data-step="4">
+                <h3>Qui commence ?</h3>
+                <div class="choice-buttons">
+                    <button class="choice-btn" data-starter="player">
+                        <i class="fas fa-user"></i>
+                        <span>Vous</span>
+                    </button>
+                    <button class="choice-btn" data-starter="opponent">
+                        <i class="fas fa-user-friends"></i>
+                        <span id="opponent-text">Adversaire</span>
+                    </button>
+                    <button class="choice-btn" data-starter="random">
+                        <i class="fas fa-random"></i>
+                        <span>Aléatoire</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="game-board-container" class="hidden">
+            <div class="game-header">
+                <div class="players">
+                    <div class="player player-x active">
+                        <i class="fas fa-times"></i>
+                        <span class="player-name">Joueur X</span>
+                        <span class="score">0</span>
+                    </div>
+                    <div class="vs">VS</div>
+                    <div class="player player-o">
+                        <i class="fas fa-circle"></i>
+                        <span class="player-name">Joueur O</span>
+                        <span class="score">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="game-board">
+                <div class="cell" data-index="0"></div>
+                <div class="cell" data-index="1"></div>
+                <div class="cell" data-index="2"></div>
+                <div class="cell" data-index="3"></div>
+                <div class="cell" data-index="4"></div>
+                <div class="cell" data-index="5"></div>
+                <div class="cell" data-index="6"></div>
+                <div class="cell" data-index="7"></div>
+                <div class="cell" data-index="8"></div>
+            </div>
+
+            <div class="game-controls">
+                <button id="restart-btn" class="action-btn">
+                    <i class="fas fa-redo"></i> Nouvelle partie
+                </button>
+                <button id="reset-score-btn" class="action-btn">
+                    <i class="fas fa-trash"></i> Réinitialiser les scores
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="victory-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Victoire ! 🎉</h2>
+            <p>Le <span id="winner-text"></span> remporte la partie !</p>
+            <div class="next-player-choice hidden">
+                <h3>Qui commence la prochaine partie ?</h3>
+                <div class="choice-buttons">
+                    <button class="choice-btn next-player-btn" data-player="X">
+                        <div class="symbol-preview x-preview"></div>
+                        <span>Joueur X</span>
+                    </button>
+                    <button class="choice-btn next-player-btn" data-player="O">
+                        <div class="symbol-preview o-preview"></div>
+                        <span>Joueur O</span>
+                    </button>
+                    <button class="choice-btn next-player-btn" data-player="random">
+                        <i class="fas fa-random"></i>
+                        <span>Aléatoire</span>
+                    </button>
+                </div>
+            </div>
+            <div class="buttons">
+                <button id="play-again-btn" class="action-btn">
+                    <i class="fas fa-redo"></i> Rejouer
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --success-color: #06d6a0;
+            --error-color: #ef476f;
+            --warning-color: #ffca3a;
+            --info-color: #118ab2;
+            --background-color: #f8f9fa;
+            --card-color: #ffffff;
+            --text-color: #212529;
+            --text-secondary: #6c757d;
+            --border-color: #e9ecef;
+            --border-radius: 12px;
+            --box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            --transition-speed: 0.3s;
+        }
+
+        [data-theme="dark"] {
+            --background-color: #1a1a1a;
+            --card-color: #2d2d2d;
+            --text-color: #ffffff;
+            --text-secondary: #a0a0a0;
+            --border-color: #404040;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            background: transparent;
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        #background-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            z-index: 1;
+        }
+
+        .game-header {
+            margin-bottom: 30px;
+        }
+
+        .players {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .player {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px 25px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .player.active {
+            background: var(--primary-color);
+            transform: scale(1.05);
+        }
+
+        .player i {
+            font-size: 1.2em;
+        }
+
+        .player .score {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .vs {
+            font-weight: bold;
+            color: white;
+            font-size: 1.2em;
+        }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+            aspect-ratio: 1;
+        }
+
+        .cell {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+            color: white;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cell:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        .cell.x::before,
+        .cell.x::after {
+            content: '';
+            position: absolute;
+            width: 10%;
+            height: 70%;
+            background: var(--error-color);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .cell.x::before {
+            transform: rotate(45deg) scale(0);
+            animation: drawX1 0.3s forwards;
+        }
+
+        .cell.x::after {
+            transform: rotate(-45deg) scale(0);
+            animation: drawX2 0.3s forwards;
+        }
+
+        .cell.o::before {
+            content: '';
+            position: absolute;
+            width: 60%;
+            height: 60%;
+            border: 6px solid var(--success-color);
+            border-radius: 50%;
+            transform: scale(0);
+            animation: drawO 0.3s forwards;
+        }
+
+        @keyframes drawX1 {
+            to {
+                transform: rotate(45deg) scale(1);
+            }
+        }
+
+        @keyframes drawX2 {
+            to {
+                transform: rotate(-45deg) scale(1);
+            }
+        }
+
+        @keyframes drawO {
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .cell.winning {
+            animation: winPulse 1s infinite;
+        }
+
+        @keyframes winPulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(67, 97, 238, 0.4);
+            }
+            70% {
+                transform: scale(1.05);
+                box-shadow: 0 0 0 10px rgba(67, 97, 238, 0);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(67, 97, 238, 0);
+            }
+        }
+
+        .game-controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            background: var(--primary-color);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: var(--secondary-color);
+            transform: scale(1.05);
+        }
+
+        .global-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .control-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .control-btn i {
+            font-size: 1.2em;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            color: white;
+        }
+
+        .modal h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .game-setup {
+            color: white;
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .game-setup h2 {
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .setup-step {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .setup-step.active {
+            display: block;
+        }
+
+        .setup-step h3 {
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .choice-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .choice-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            padding: 20px;
+            border-radius: 15px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            min-width: 150px;
+            transition: all 0.3s ease;
+        }
+
+        .choice-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .choice-btn.selected {
+            background: var(--primary-color);
+            transform: scale(1.05);
+        }
+
+        .choice-btn i {
+            font-size: 2em;
+        }
+
+        .choice-btn small {
+            font-size: 0.8em;
+            opacity: 0.8;
+            display: block;
+            margin-top: 5px;
+        }
+
+        .symbol-preview {
+            width: 50px;
+            height: 50px;
+            position: relative;
+        }
+
+        .x-preview::before,
+        .x-preview::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 6px;
+            background: var(--error-color);
+            top: 50%;
+            left: 0;
+            border-radius: 3px;
+        }
+
+        .x-preview::before {
+            transform: rotate(45deg);
+        }
+
+        .x-preview::after {
+            transform: rotate(-45deg);
+        }
+
+        .o-preview::before {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 6px solid var(--success-color);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .players {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .vs {
+                display: none;
+            }
+
+            .cell {
+                font-size: 2em;
+            }
+
+            .game-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+
+        .next-player-choice {
+            margin: 20px 0;
+        }
+
+        .next-player-choice h3 {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .next-player-btn {
+            min-width: 120px;
+            padding: 15px;
+        }
+
+        .next-player-btn.selected {
+            background: var(--primary-color);
+            transform: scale(1.05);
+        }
+    </style>
+
+    <script>
+        // Configuration du jeu
+        const gameConfig = {
+            mode: null, // 'human' ou 'bot'
+            playerSymbol: null, // 'X' ou 'O'
+            starter: null, // 'player', 'opponent' ou 'random'
+            currentStep: 1,
+            difficulty: 'normal' // 'easy', 'normal', ou 'hard'
+        };
+
+        // État du jeu
+        const gameState = {
+            board: Array(9).fill(''),
+            currentPlayer: 'X',
+            scores: { X: 0, O: 0 },
+            gameEnded: false,
+            isPlayerTurn: true,
+            isBotMode: false,
+            lastStarter: null
+        };
+
+        // Combinaisons gagnantes
+        const winningCombos = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8], // Lignes
+            [0, 3, 6], [1, 4, 7], [2, 5, 8], // Colonnes
+            [0, 4, 8], [2, 4, 6] // Diagonales
+        ];
+
+        // Gestionnaire de configuration
+        function handleConfigChoice(element, type) {
+            const step = element.closest('.setup-step');
+            const buttons = step.querySelectorAll('.choice-btn');
+            buttons.forEach(btn => btn.classList.remove('selected'));
+            element.classList.add('selected');
+
+            switch(type) {
+                case 'mode':
+                    gameConfig.mode = element.dataset.mode;
+                    gameState.isBotMode = gameConfig.mode === 'bot';
+                    document.getElementById('opponent-text').textContent = 
+                        gameConfig.mode === 'bot' ? 'Bot' : 'Adversaire';
+                    // Afficher l'étape suivante selon le mode
+                    if (gameConfig.mode === 'bot') {
+                        gameConfig.currentStep = 1;
+                        showNextStep(); // Passer à l'étape de difficulté
+                    } else {
+                        gameConfig.currentStep = 2;
+                        showNextStep(); // Passer à l'étape du symbole
+                    }
+                    break;
+                case 'difficulty':
+                    gameConfig.difficulty = element.dataset.difficulty;
+                    showNextStep(); // Passer à l'étape du symbole
+                    break;
+                case 'symbol':
+                    gameConfig.playerSymbol = element.dataset.symbol;
+                    showNextStep(); // Passer à l'étape du starter
+                    break;
+                case 'starter':
+                    gameConfig.starter = element.dataset.starter;
+                    startGame();
+                    break;
+            }
+        }
+
+        function showNextStep() {
+            const currentStep = document.querySelector(`.setup-step[data-step="${gameConfig.currentStep}"]`);
+            const nextStep = document.querySelector(`.setup-step[data-step="${gameConfig.currentStep + 1}"]`);
+            
+            currentStep.classList.remove('active');
+            nextStep.classList.add('active');
+            gameConfig.currentStep++;
+        }
+
+        function startGame() {
+            // Réinitialiser le plateau
+            gameState.board = Array(9).fill('');
+            gameState.gameEnded = false;
+
+            // Déterminer qui commence
+            if (gameConfig.starter === 'random') {
+                gameConfig.starter = Math.random() < 0.5 ? 'player' : 'opponent';
+            }
+
+            // Configurer le premier joueur
+            gameState.currentPlayer = 'X';
+            
+            // Déterminer si c'est le tour du joueur
+            if (gameState.isBotMode) {
+                if (gameConfig.playerSymbol === 'X') {
+                    gameState.isPlayerTurn = (gameConfig.starter === 'player');
+                } else {
+                    gameState.isPlayerTurn = (gameConfig.starter === 'opponent');
+                }
+            } else {
+                gameState.isPlayerTurn = true;
+            }
+
+            // Mettre à jour les noms des joueurs
+            updatePlayerNames();
+
+            // Cacher le menu de configuration et afficher le jeu
+            document.getElementById('game-setup').classList.add('hidden');
+            document.getElementById('game-board-container').classList.remove('hidden');
+
+            // Si c'est le tour du bot, faire jouer le bot
+            if (gameState.isBotMode && !gameState.isPlayerTurn) {
+                setTimeout(() => {
+                    console.log("Bot's turn");
+                    makeBotMove();
+                }, 500);
+            }
+        }
+
+        function updatePlayerNames() {
+            const playerXName = document.querySelector('.player-x .player-name');
+            const playerOName = document.querySelector('.player-o .player-name');
+            
+            if (gameState.isBotMode) {
+                if (gameConfig.playerSymbol === 'X') {
+                    playerXName.textContent = 'Vous';
+                    playerOName.textContent = 'Bot';
+                } else {
+                    playerXName.textContent = 'Bot';
+                    playerOName.textContent = 'Vous';
+                }
+            }
+        }
+
+        function makeBotMove() {
+            if (gameState.gameEnded) return;
+
+            console.log("Making bot move");
+            console.log("Current board:", gameState.board);
+            console.log("Bot symbol:", gameConfig.playerSymbol === 'X' ? 'O' : 'X');
+
+            const botSymbol = gameConfig.playerSymbol === 'X' ? 'O' : 'X';
+            let bestMove;
+
+            switch(gameConfig.difficulty) {
+                case 'easy':
+                    bestMove = makeRandomMove();
+                    break;
+                case 'normal':
+                    bestMove = makeNormalMove(botSymbol);
+                    break;
+                case 'hard':
+                    bestMove = makeHardMove(botSymbol);
+                    break;
+                default:
+                    bestMove = makeRandomMove();
+            }
+
+            console.log("Bot chose move:", bestMove);
+
+            if (bestMove !== null && bestMove !== undefined) {
+                const cell = document.querySelector(`[data-index="${bestMove}"]`);
+                if (cell) {
+                    console.log("Bot playing on cell:", bestMove);
+                    handleCellClick(cell);
+                }
+            }
+        }
+
+        function makeRandomMove() {
+            const emptyCells = gameState.board
+                .map((cell, index) => cell === '' ? index : null)
+                .filter(cell => cell !== null);
+            
+            if (emptyCells.length === 0) return null;
+            return emptyCells[Math.floor(Math.random() * emptyCells.length)];
+        }
+
+        function makeNormalMove(botSymbol) {
+            const playerSymbol = gameConfig.playerSymbol;
+            const emptyCells = gameState.board
+                .map((cell, index) => cell === '' ? index : null)
+                .filter(cell => cell !== null);
+
+            if (emptyCells.length === 0) return null;
+
+            // 1. Vérifier si le bot peut gagner
+            for (let i = 0; i < 9; i++) {
+                if (gameState.board[i] === '') {
+                    gameState.board[i] = botSymbol;
+                    if (checkWinForSymbol(gameState.board, botSymbol)) {
+                        gameState.board[i] = '';
+                        return i;
+                    }
+                    gameState.board[i] = '';
+                }
+            }
+
+            // 2. Bloquer le joueur s'il peut gagner
+            for (let i = 0; i < 9; i++) {
+                if (gameState.board[i] === '') {
+                    gameState.board[i] = playerSymbol;
+                    if (checkWinForSymbol(gameState.board, playerSymbol)) {
+                        gameState.board[i] = '';
+                        return i;
+                    }
+                    gameState.board[i] = '';
+                }
+            }
+
+            // 3. Jouer au centre si disponible
+            if (gameState.board[4] === '') return 4;
+
+            // 4. Jouer dans un coin aléatoire
+            const corners = [0, 2, 6, 8].filter(i => gameState.board[i] === '');
+            if (corners.length > 0) {
+                return corners[Math.floor(Math.random() * corners.length)];
+            }
+
+            // 5. Jouer sur un côté aléatoire
+            const sides = [1, 3, 5, 7].filter(i => gameState.board[i] === '');
+            if (sides.length > 0) {
+                return sides[Math.floor(Math.random() * sides.length)];
+            }
+
+            return emptyCells[0];
+        }
+
+        function makeHardMove(botSymbol) {
+            const bestMove = minimax(gameState.board, botSymbol, true).index;
+            return bestMove;
+        }
+
+        function minimax(board, symbol, isMaximizing) {
+            const playerSymbol = gameConfig.playerSymbol;
+            const botSymbol = gameConfig.playerSymbol === 'X' ? 'O' : 'X';
+            
+            // Vérifier les conditions de fin
+            if (checkWinForSymbol(board, botSymbol)) return { score: 10 };
+            if (checkWinForSymbol(board, playerSymbol)) return { score: -10 };
+            if (!board.includes('')) return { score: 0 };
+
+            const moves = [];
+            
+            for (let i = 0; i < 9; i++) {
+                if (board[i] === '') {
+                    const move = {};
+                    move.index = i;
+                    board[i] = symbol;
+
+                    if (isMaximizing) {
+                        move.score = minimax(board, playerSymbol, false).score;
+                    } else {
+                        move.score = minimax(board, botSymbol, true).score;
+                    }
+
+                    board[i] = '';
+                    moves.push(move);
+                }
+            }
+
+            let bestMove;
+            if (isMaximizing) {
+                let bestScore = -Infinity;
+                for (let i = 0; i < moves.length; i++) {
+                    if (moves[i].score > bestScore) {
+                        bestScore = moves[i].score;
+                        bestMove = i;
+                    }
+                }
+            } else {
+                let bestScore = Infinity;
+                for (let i = 0; i < moves.length; i++) {
+                    if (moves[i].score < bestScore) {
+                        bestScore = moves[i].score;
+                        bestMove = i;
+                    }
+                }
+            }
+
+            return moves[bestMove];
+        }
+
+        function handleCellClick(cell) {
+            const index = parseInt(cell.dataset.index);
+            
+            if (gameState.board[index] !== '' || gameState.gameEnded || 
+                (gameState.isBotMode && !gameState.isPlayerTurn)) {
+                return;
+            }
+
+            // Placer le symbole
+            gameState.board[index] = gameState.currentPlayer;
+            cell.classList.add(gameState.currentPlayer.toLowerCase());
+
+            // Vérifier la victoire
+            if (checkWin()) {
+                gameState.scores[gameState.currentPlayer]++;
+                updateScores();
+                showVictory();
+                gameState.gameEnded = true;
+                return;
+            }
+
+            // Vérifier l'égalité
+            if (checkDraw()) {
+                showDraw();
+                gameState.gameEnded = true;
+                return;
+            }
+
+            // Changer de joueur
+            gameState.currentPlayer = gameState.currentPlayer === 'X' ? 'O' : 'X';
+            gameState.isPlayerTurn = !gameState.isPlayerTurn;
+            updatePlayerTurn();
+
+            // Si c'est le tour du bot, faire jouer le bot
+            if (gameState.isBotMode && !gameState.isPlayerTurn) {
+                setTimeout(makeBotMove, 500);
+            }
+        }
+
+        // Vérifier la victoire
+        function checkWin() {
+            return winningCombos.some(combo => {
+                const hasWon = combo.every(index => {
+                    return gameState.board[index] === gameState.currentPlayer;
+                });
+                
+                if (hasWon) {
+                    // Ajouter l'animation de victoire aux cellules gagnantes
+                    combo.forEach(index => {
+                        document.querySelector(`[data-index="${index}"]`).classList.add('winning');
+                    });
+                }
+                
+                return hasWon;
+            });
+        }
+
+        // Vérifier l'égalité
+        function checkDraw() {
+            return gameState.board.every(cell => cell !== '');
+        }
+
+        // Mettre à jour l'affichage du tour du joueur
+        function updatePlayerTurn() {
+            document.querySelector('.player-x').classList.toggle('active', gameState.currentPlayer === 'X');
+            document.querySelector('.player-o').classList.toggle('active', gameState.currentPlayer === 'O');
+        }
+
+        // Mettre à jour les scores
+        function updateScores() {
+            document.querySelector('.player-x .score').textContent = gameState.scores.X;
+            document.querySelector('.player-o .score').textContent = gameState.scores.O;
+        }
+
+        // Afficher la victoire
+        function showVictory() {
+            const modal = document.getElementById('victory-modal');
+            const nextPlayerChoice = modal.querySelector('.next-player-choice');
+            document.getElementById('winner-text').textContent = `Joueur ${gameState.currentPlayer}`;
+            
+            // Afficher les options de choix du prochain joueur uniquement en mode duo
+            if (!gameState.isBotMode) {
+                nextPlayerChoice.classList.remove('hidden');
+                // Réinitialiser la sélection
+                nextPlayerChoice.querySelectorAll('.next-player-btn').forEach(btn => {
+                    btn.classList.remove('selected');
+                });
+            } else {
+                nextPlayerChoice.classList.add('hidden');
+            }
+            
+            modal.classList.remove('hidden');
+        }
+
+        // Afficher l'égalité
+        function showDraw() {
+            const modal = document.getElementById('victory-modal');
+            const nextPlayerChoice = modal.querySelector('.next-player-choice');
+            document.querySelector('#victory-modal h2').textContent = 'Égalité !';
+            document.getElementById('winner-text').textContent = 'Personne ne';
+            
+            // Afficher les options de choix du prochain joueur uniquement en mode duo
+            if (!gameState.isBotMode) {
+                nextPlayerChoice.classList.remove('hidden');
+                // Réinitialiser la sélection
+                nextPlayerChoice.querySelectorAll('.next-player-btn').forEach(btn => {
+                    btn.classList.remove('selected');
+                });
+            } else {
+                nextPlayerChoice.classList.add('hidden');
+            }
+            
+            modal.classList.remove('hidden');
+        }
+
+        // Réinitialiser la partie
+        function resetGame() {
+            gameState.board = Array(9).fill('');
+            gameState.gameEnded = false;
+            
+            // Déterminer qui commence la nouvelle partie
+            if (gameState.isBotMode) {
+                // En mode bot, on alterne automatiquement
+                if (gameState.lastStarter === 'player') {
+                    gameState.isPlayerTurn = false;
+                    gameState.lastStarter = 'opponent';
+                } else {
+                    gameState.isPlayerTurn = true;
+                    gameState.lastStarter = 'player';
+                }
+                gameState.currentPlayer = 'X';
+            } else {
+                // En mode duo, on utilise le choix du joueur
+                const selectedBtn = document.querySelector('.next-player-btn.selected');
+                if (selectedBtn) {
+                    const nextPlayer = selectedBtn.dataset.player;
+                    if (nextPlayer === 'random') {
+                        gameState.currentPlayer = Math.random() < 0.5 ? 'X' : 'O';
+                    } else {
+                        gameState.currentPlayer = nextPlayer;
+                    }
+                }
+            }
+
+            // Mettre à jour l'interface
+            document.querySelectorAll('.cell').forEach(cell => {
+                cell.className = 'cell';
+                void cell.offsetWidth;
+            });
+            
+            document.getElementById('victory-modal').classList.add('hidden');
+            document.querySelector('#victory-modal h2').textContent = 'Victoire ! 🎉';
+            updatePlayerTurn();
+
+            // Si c'est le tour du bot, faire jouer le bot
+            if (gameState.isBotMode && !gameState.isPlayerTurn) {
+                setTimeout(makeBotMove, 1000);
+            }
+        }
+
+        // Réinitialiser les scores
+        function resetScores() {
+            gameState.scores.X = 0;
+            gameState.scores.O = 0;
+            updateScores();
+        }
+
+        // Gestionnaire de thème
+        let darkMode = localStorage.getItem('darkMode') === 'true';
+        
+        function toggleTheme() {
+            darkMode = !darkMode;
+            document.body.setAttribute('data-theme', darkMode ? 'dark' : 'light');
+            document.getElementById('theme-toggle').innerHTML = 
+                darkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+            localStorage.setItem('darkMode', darkMode);
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialiser le thème
+            if (darkMode) {
+                document.body.setAttribute('data-theme', 'dark');
+                document.getElementById('theme-toggle').innerHTML = '<i class="fas fa-sun"></i>';
+            }
+
+            // Écouteurs d'événements
+            document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+            document.querySelectorAll('.cell').forEach(cell => {
+                cell.addEventListener('click', () => handleCellClick(cell));
+            });
+            document.getElementById('restart-btn').addEventListener('click', resetGame);
+            document.getElementById('reset-score-btn').addEventListener('click', resetScores);
+            document.getElementById('play-again-btn').addEventListener('click', function() {
+                if (!gameState.isBotMode && !document.querySelector('.next-player-btn.selected')) {
+                    // Si aucun joueur n'est sélectionné en mode duo, choisir aléatoirement
+                    const randomBtn = document.querySelector('[data-player="random"]');
+                    randomBtn.classList.add('selected');
+                }
+                resetGame();
+            });
+
+            // Animation du fond
+            initBackground();
+
+            // Ajouter les écouteurs d'événements pour la configuration
+            document.querySelectorAll('.choice-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const type = this.dataset.mode ? 'mode' : 
+                               this.dataset.difficulty ? 'difficulty' :
+                               this.dataset.symbol ? 'symbol' : 'starter';
+                    handleConfigChoice(this, type);
+                });
+            });
+
+            // Ajouter les écouteurs pour les boutons de sélection du prochain joueur
+            document.querySelectorAll('.next-player-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.next-player-btn').forEach(b => b.classList.remove('selected'));
+                    this.classList.add('selected');
+                });
+            });
+        });
+
+        // Code d'animation du fond (même que dans les autres jeux)
+        function initBackground() {
+            const canvas = document.getElementById('background-canvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+            
+            class Particle {
+                constructor() {
+                    this.reset();
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                }
+                
+                reset() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.size = Math.random() * 5 + 1;
+                    this.speedX = Math.random() * 3 - 1.5;
+                    this.speedY = Math.random() * 3 - 1.5;
+                    this.color = `hsla(${Math.random() * 60 + 220}, 70%, 70%, ${Math.random() * 0.3 + 0.1})`;
+                    this.life = 100;
+                }
+                
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                    this.life -= 0.2;
+                    
+                    if (this.life <= 0) {
+                        this.reset();
+                    }
+                    
+                    if (this.x > canvas.width || this.x < 0 || this.y > canvas.height || this.y < 0) {
+                        this.reset();
+                    }
+                }
+                
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+                    
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = this.color;
+                }
+            }
+            
+            function init() {
+                particles = [];
+                for (let i = 0; i < 100; i++) {
+                    particles.push(new Particle());
+                }
+            }
+            
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                const time = Date.now() * 0.001;
+                const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                gradient.addColorStop(0, `hsl(${220 + Math.sin(time) * 10}, 70%, 20%)`);
+                gradient.addColorStop(1, `hsl(${240 + Math.cos(time) * 10}, 70%, 25%)`);
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.shadowBlur = 0;
+                
+                particles.forEach(particle => {
+                    particle.update();
+                    particle.draw();
+                });
+                
+                requestAnimationFrame(animate);
+            }
+            
+            init();
+            animate();
+        }
+    </script>
+</body>
+</html> 

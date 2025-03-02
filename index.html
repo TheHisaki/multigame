@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu des Jeux</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+</head>
+<body>
+    <canvas id="background-canvas"></canvas>
+
+    <div class="global-controls">
+        <button id="theme-toggle" class="control-btn" title="Changer de thème">
+            <i class="fas fa-moon"></i>
+        </button>
+        <button id="sound-toggle" class="control-btn" title="Son">
+            <i class="fas fa-volume-up"></i>
+        </button>
+    </div>
+
+    <div class="container">
+        <h1 class="title">Menu des Jeux</h1>
+        
+        <div class="categories">
+            <div class="category">
+                <h2><i class="fas fa-user"></i> Solo</h2>
+                <div class="games">
+                    <a href="password-game.html" class="game-card">
+                        <i class="fas fa-key"></i>
+                        <h3>Password Game</h3>
+                        <p>Créez un mot de passe qui respecte toutes les règles !</p>
+                    </a>
+                    <a href="memory-game.html" class="game-card">
+                        <i class="fas fa-brain"></i>
+                        <h3>Memory Game</h3>
+                        <p>Testez votre mémoire en trouvant les paires !</p>
+                    </a>
+                    <a href="snake.html" class="game-card">
+                        <i class="fas fa-dragon"></i>
+                        <h3>Snake</h3>
+                        <p>Le classique revisité avec des power-ups et des effets spéciaux !</p>
+                    </a>
+                    <a href="stellar-defender.html" class="game-card">
+                        <i class="fas fa-space-shuttle"></i>
+                        <h3>Stellar Defender</h3>
+                        <p>Défendez la galaxie contre des vagues d'ennemis dans ce shoot'em up spatial !</p>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="category">
+                <h2><i class="fas fa-users"></i> Duo</h2>
+                <div class="games">
+                    <a href="tic-tac-toe.html" class="game-card">
+                        <i class="fas fa-hashtag"></i>
+                        <h3>Morpion</h3>
+                        <p>Affrontez un ami dans ce classique indémodable !</p>
+                    </a>
+                    <a href="pong-duo.html" class="game-card">
+                        <i class="fas fa-table-tennis"></i>
+                        <h3>Pong Duo</h3>
+                        <p>Un duel de raquettes en face à face !</p>
+                    </a>
+                    <a href="space-battle.html" class="game-card">
+                        <i class="fas fa-rocket"></i>
+                        <h3>Bataille Spatiale</h3>
+                        <p>Affrontez-vous dans un duel de vaisseaux spatiaux !</p>
+                    </a>
+            </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer class="footer">
+        <div class="footer-content">
+            <p class="copyright">
+                <span class="creator">Créé par Hisaki</span>
+                <span class="separator">•</span>
+                <span class="ai-credit">avec l'aide de l'IA (mais azzzz tkt 🤫)</span>
+            </p>
+                    </div>
+    </footer>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --success-color: #06d6a0;
+            --error-color: #ef476f;
+            --warning-color: #ffca3a;
+            --info-color: #118ab2;
+            --background-color: #f8f9fa;
+            --card-color: #ffffff;
+            --text-color: #212529;
+            --text-secondary: #6c757d;
+            --border-color: #e9ecef;
+            --border-radius: 12px;
+            --box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            --transition-speed: 0.3s;
+        }
+
+        [data-theme="dark"] {
+            --background-color: #1a1a1a;
+            --card-color: #2d2d2d;
+            --text-color: #ffffff;
+            --text-secondary: #a0a0a0;
+            --border-color: #404040;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            background: transparent;
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        #background-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            padding: 40px;
+            z-index: 1;
+        }
+
+        .title {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+            font-size: 2.5em;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+
+        .category h2 {
+            color: white;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5em;
+        }
+
+        .games {
+            display: grid;
+            gap: 20px;
+        }
+
+        .game-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 10px;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .game-card i {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .game-card h3 {
+            font-size: 1.2em;
+            margin-bottom: 5px;
+        }
+
+        .game-card p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9em;
+        }
+
+        .global-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .control-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px;
+            text-align: center;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .footer-content {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 8px 20px;
+            border-radius: 20px;
+            animation: footerGlow 3s ease-in-out infinite;
+        }
+
+        .copyright {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        .creator {
+            font-weight: 500;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientText 3s ease infinite;
+        }
+
+        .separator {
+            margin: 0 8px;
+            opacity: 0.5;
+        }
+
+        .ai-credit {
+            font-style: italic;
+            opacity: 0.7;
+        }
+
+        @keyframes footerGlow {
+            0%, 100% {
+                box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+            }
+        }
+
+        @keyframes gradientText {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .title {
+                font-size: 2em;
+            }
+
+            .categories {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+    <script>
+        // Gestionnaire de thème
+        let darkMode = localStorage.getItem('darkMode') === 'true';
+        
+        function toggleTheme() {
+            darkMode = !darkMode;
+            document.body.setAttribute('data-theme', darkMode ? 'dark' : 'light');
+            document.getElementById('theme-toggle').innerHTML = 
+                darkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+            localStorage.setItem('darkMode', darkMode);
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialiser le thème
+            if (darkMode) {
+                document.body.setAttribute('data-theme', 'dark');
+                document.getElementById('theme-toggle').innerHTML = '<i class="fas fa-sun"></i>';
+            }
+
+            // Écouteurs d'événements
+            document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+
+            // Animation du fond
+            initBackground();
+        });
+
+        // Code d'animation du fond
+        function initBackground() {
+            const canvas = document.getElementById('background-canvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+            
+            class Particle {
+                constructor() {
+                    this.reset();
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                }
+                
+                reset() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.size = Math.random() * 5 + 1;
+                    this.speedX = Math.random() * 3 - 1.5;
+                    this.speedY = Math.random() * 3 - 1.5;
+                    this.color = `hsla(${Math.random() * 60 + 220}, 70%, 70%, ${Math.random() * 0.3 + 0.1})`;
+                    this.life = 100;
+                }
+                
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                    this.life -= 0.2;
+                    
+                    if (this.life <= 0) {
+                        this.reset();
+                    }
+                    
+                    if (this.x > canvas.width || this.x < 0 || this.y > canvas.height || this.y < 0) {
+                        this.reset();
+                    }
+                }
+                
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+                    
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = this.color;
+                }
+            }
+            
+            function init() {
+                particles = [];
+                for (let i = 0; i < 100; i++) {
+                    particles.push(new Particle());
+                }
+            }
+            
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                const time = Date.now() * 0.001;
+                const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                gradient.addColorStop(0, `hsl(${220 + Math.sin(time) * 10}, 70%, 20%)`);
+                gradient.addColorStop(1, `hsl(${240 + Math.cos(time) * 10}, 70%, 25%)`);
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.shadowBlur = 0;
+                
+                particles.forEach(particle => {
+                    particle.update();
+                    particle.draw();
+                });
+                
+                requestAnimationFrame(animate);
+            }
+            
+            init();
+            animate();
+        }
+    </script>
+</body>
+</html>
